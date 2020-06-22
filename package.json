@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^7.2.1",
     "apollo-boost": "^0.4.9",
     "graphql": "^15.1.0",
+    "now": "^19.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
