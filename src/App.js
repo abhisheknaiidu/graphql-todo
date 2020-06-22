@@ -22,6 +22,17 @@ mutation toggleTodo($id: uuid!, $done: Boolean!) {
   }
 }
 `
+const ADD_TODO = gql`
+mutation addTodo($text: String!) {
+  insert_todos(objects: {text: $text}) {
+    returning {
+      done
+      id
+      text
+    }
+  }
+}
+`
 
 // List Todos
 // Add Todos
@@ -29,17 +40,30 @@ mutation toggleTodo($id: uuid!, $done: Boolean!) {
 // Delete Todos
 function App() {
 
+  const [todotext, setTodotext] = React.useState('')
   const { loading, data, error } = useQuery(GET_TODOS)
   // Destructuring because it return an object
   const [toggleTodo] = useMutation(TOGGLE_TODO)
   // console.log(stuff)
+
+  const [addTodo] = useMutation(ADD_TODO)
 
   async function handleToggleTodo({ id, done }) {
     const data = await toggleTodo({ variables: {
       id: id,
       done: !done
     }})
-    console.log(data)
+    console('toggled data', data)
+  }
+
+  async function handleAddTodo(event) {
+    event.preventDefault()
+    //Checking blank todo's
+    if(!todotext.trim()) return;
+
+    const  data = addTodo({variables: { text: todotext }})
+    console.log('Added todo', data)
+    setTodotext('')
   }
 
   if(loading) return <div>Loading...</div>
@@ -49,10 +73,13 @@ function App() {
     <div className="vh-100 code flex flex-column 
     items-center bg-purple white pa3 fl-1">
       <h1 className="f2-1" aria-label="checklist">GraphQL Checklist ✅</h1>
-      <form className="mb3">
+      <form onSubmit={handleAddTodo} className="mb3">
         <input className="pa2 f4 b--dashed" 
         type="text"
-        placeholder="Write your todo" />
+        placeholder="Write your todo"
+        onChange={ event => setTodotext(event.target.value)}
+        value={todotext} //for context
+        />
         <button className="pa2 f4 bg-green" type="submt"> 
         Create 
         </button>
