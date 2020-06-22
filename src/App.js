@@ -46,7 +46,9 @@ function App() {
   const [toggleTodo] = useMutation(TOGGLE_TODO)
   // console.log(stuff)
 
-  const [addTodo] = useMutation(ADD_TODO)
+  const [addTodo] = useMutation(ADD_TODO, {
+    onCompleted: () => setTodotext('')
+  })
 
   async function handleToggleTodo({ id, done }) {
     const data = await toggleTodo({ variables: {
@@ -61,9 +63,10 @@ function App() {
     //Checking blank todo's
     if(!todotext.trim()) return;
 
-    const  data = addTodo({variables: { text: todotext }})
+    //refetch queries adding such that todos will get load up asa we create todo!
+    const  data = addTodo({variables: { text: todotext }, refetchQueries: [{ query:GET_TODOS }]})
     console.log('Added todo', data)
-    setTodotext('')
+    // setTodotext('')
   }
 
   if(loading) return <div>Loading...</div>
