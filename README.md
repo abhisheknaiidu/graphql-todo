@@ -1,6 +1,6 @@
-A Simple CRUD To-Do Application 📝 built using GraphQL, Apollo Client and React!
+A Simple CRUD [To-Do](https://graphql-todo-beta.vercel.app/) Application 📝 built using GraphQL, Apollo Client and React! 
 
-API is being hosted on Heroku using Apollo Client, [DEMO](https://graphql-todo-beta.vercel.app/)
+API is being hosted on Heroku using Apollo Client! 
 
 ![Screenshot](apollo.png)
 
