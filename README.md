@@ -1,3 +1,8 @@
+A Simple CRUD To-Do Application 📝 built using GraphQL and Apollo Client!
+
+API is being hosted on Heroku using Apollo Client
+
+![Screenshot](apollo.png)
 
 
 ### Development:
