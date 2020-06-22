@@ -33,6 +33,17 @@ mutation addTodo($text: String!) {
   }
 }
 `
+const DELETE_TODO = gql`
+mutation deleteTodo($id: uuid!) {
+  delete_todos(where: {id: {_eq: $id}}) {
+    returning {
+      done
+      id
+      text
+    }
+  }
+}
+`
 
 // List Todos
 // Add Todos
@@ -49,6 +60,7 @@ function App() {
   const [addTodo] = useMutation(ADD_TODO, {
     onCompleted: () => setTodotext('')
   })
+  const [deleteTodo] = useMutation(DELETE_TODO)
 
   async function handleToggleTodo({ id, done }) {
     const data = await toggleTodo({ variables: {
@@ -64,9 +76,23 @@ function App() {
     if(!todotext.trim()) return;
 
     //refetch queries adding such that todos will get load up asa we create todo!
-    const  data = addTodo({variables: { text: todotext }, refetchQueries: [{ query:GET_TODOS }]})
+    const  data = await addTodo({variables: { text: todotext }, refetchQueries: [{ query:GET_TODOS }]})
     console.log('Added todo', data)
     // setTodotext('')
+  }
+
+  async function handleDeleteTodo({ id }) {
+    const isConfirmed = window.confirm('Do you want to delete this todo 📝')
+    if(isConfirmed) {
+      const data = await deleteTodo({ variables: { id }, update: cache => {
+        //Read from cache
+        const  prevData = cache.readQuery({ query: GET_TODOS })
+        //Manually updates the todo
+        const newTodos = prevData.todos.filter( todo => todo.id !== id )
+        // Then write back to the cache
+        cache.writeQuery( { query: GET_TODOS , data: { todos: newTodos}})
+      }}) 
+    }
   }
 
   if(loading) return <div>Loading...</div>
@@ -83,6 +109,7 @@ function App() {
         onChange={ event => setTodotext(event.target.value)}
         value={todotext} //for context
         />
+        {/* Adding () => because of each unique key is passing */}
         <button className="pa2 f4 bg-green" type="submt"> 
         Create 
         </button>
@@ -94,7 +121,7 @@ function App() {
           <span className={`pointer list pa1 f3 ${todo.done && 'strike'} `}>
             {todo.text}
           </span>
-          <button className="bg-transparent bn f4">
+          <button onClick={ () => handleDeleteTodo(todo)} className="bg-transparent bn f4">
             <span className="red">
               &times;
             </span> 
